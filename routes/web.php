@@ -39,4 +39,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/reports', \App\Livewire\Admin\ReportManager::class)->name('reports')->middleware('menu.access:reports');
     Route::get('/activity-logs', \App\Livewire\Admin\ActivityLogManager::class)->name('activity-logs')->middleware('role:owner');
     Route::get('/settings', \App\Livewire\Admin\SettingManager::class)->name('settings')->middleware('menu.access:settings');
+    
+    // Member Card Export
+    Route::get('/customers/{customer}/card/download', [\App\Http\Controllers\MemberCardController::class, 'download'])->name('customers.card.download');
 });

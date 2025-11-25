@@ -21,4 +21,15 @@ class Product extends Model
     {
         return $this->hasMany(Stock::class);
     }
+
+    protected static function booted()
+    {
+        static::saved(function ($product) {
+            \Illuminate\Support\Facades\Cache::put('products_last_updated', now()->timestamp);
+        });
+
+        static::deleted(function ($product) {
+            \Illuminate\Support\Facades\Cache::put('products_last_updated', now()->timestamp);
+        });
+    }
 }

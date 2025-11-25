@@ -17,8 +17,10 @@ class PosInterface extends Component
 {
     // public $products = []; // Removed to prevent hydration issues
     public $categories = [];
-    public $selectedCategory = null;
+    public $selectedCategory = '';
+    public $stockFilter = 'all';
     public $search = '';
+    public $perPage = 12;
     
     public $cart = [];
     public $subtotal = 0;
@@ -36,10 +38,16 @@ class PosInterface extends Component
     public $pointsEarned = 0;
     
     public $limit = 12;
+    
+    // Real-time updates
+    public $lastLoadedAt = 0;
+    
+    protected $listeners = ['refresh-products' => '$refresh'];
 
     public function mount()
     {
         $this->categories = Category::all();
+        $this->lastLoadedAt = now()->timestamp;
     }
     
     public function loadMore()
@@ -57,6 +65,13 @@ class PosInterface extends Component
         if ($user->branch_id) {
             $query->whereHas('stocks', function($q) use ($user) {
                 $q->where('branch_id', $user->branch_id);
+                
+                // Apply stock filter
+                if ($this->stockFilter === 'in_stock') {
+                    $q->where('quantity', '>', 0);
+                } elseif ($this->stockFilter === 'out_of_stock') {
+                    $q->where('quantity', '<=', 0);
+                }
             })->with(['stocks' => function($q) use ($user) {
                 $q->where('branch_id', $user->branch_id);
             }]);
@@ -349,10 +364,17 @@ class PosInterface extends Component
             );
             
             $this->dispatch('success', 'Transaction completed successfully!');
+            $this->dispatch('transaction-completed');
             
-            // Reset cart
+            // Reset cart & state
             $this->cart = [];
             $this->cash = 0;
+            $this->selectedCustomerId = null;
+            $this->customerSearch = '';
+            $this->usePoints = false;
+            $this->pointsToUse = 0;
+            $this->pointsDiscount = 0;
+            $this->pointsEarned = 0;
             $this->calculateTotal();
             
         } catch (\Exception $e) {
@@ -381,12 +403,14 @@ class PosInterface extends Component
         }
         
         $selectedCustomer = $this->selectedCustomerId ? Customer::find($this->selectedCustomerId) : null;
+        
+        $this->lastLoadedAt = now()->timestamp;
 
         return view('livewire.cashier.pos-interface', [
             'products' => $products,
             'totalCount' => $totalCount,
             'customers' => $customers,
             'selectedCustomer' => $selectedCustomer,
-        ])->layout('layouts.app');
+        ])->layout('layouts.pos');
     }
 }

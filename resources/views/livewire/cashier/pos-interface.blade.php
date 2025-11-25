@@ -29,12 +29,22 @@
     </style>
 
     <div class="h-[calc(100vh-8rem)]">
+        <livewire:cashier.product-update-checker :last-loaded-at="$lastLoadedAt" />
+
         <div class="flex gap-6 h-full">
             <!-- Left Panel - Products -->
-            <div class="flex-1 bg-white rounded-2xl shadow-sm border border-zinc-100 flex flex-col">
+            <div class="flex-1 bg-white rounded-2xl shadow-sm border border-zinc-100 flex flex-col" 
+                x-data="{ 
+                    columnCount: parseInt(localStorage.getItem('posColumns')) || 4,
+                    setColumns(count) {
+                        this.columnCount = count;
+                        localStorage.setItem('posColumns', count);
+                    }
+                }"
+            >
                 <!-- Search & Filter -->
                 <div class="p-6 border-b border-zinc-100">
-                    <div class="flex gap-4">
+                    <div class="flex gap-4 items-center">
                         <div class="flex-1 relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <svg class="h-5 w-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -57,13 +67,35 @@
                                 @endforeach
                             </select>
                         </div>
+                        <div class="w-40">
+                            <select 
+                                wire:model.live="stockFilter" 
+                                class="w-full py-2.5 rounded-xl border-zinc-200 bg-zinc-50 focus:bg-white focus:border-indigo-500 focus:ring-indigo-500/20 transition-all text-zinc-600"
+                            >
+                                <option value="all">All Stock</option>
+                                <option value="in_stock">In Stock</option>
+                                <option value="out_of_stock">Out of Stock</option>
+                            </select>
+                        </div>
+                        <!-- Column Switcher -->
+                        <div class="flex bg-zinc-100 rounded-xl p-1 border border-zinc-200">
+                            <button @click="setColumns(4)" :class="columnCount === 4 ? 'bg-white text-indigo-600 shadow-sm' : 'text-zinc-400 hover:text-zinc-600'" class="p-1.5 rounded-lg transition-all" title="4 Columns">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                            </button>
+                            <button @click="setColumns(5)" :class="columnCount === 5 ? 'bg-white text-indigo-600 shadow-sm' : 'text-zinc-400 hover:text-zinc-600'" class="p-1.5 rounded-lg transition-all" title="5 Columns">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                            </button>
+                            <button @click="setColumns(6)" :class="columnCount === 6 ? 'bg-white text-indigo-600 shadow-sm' : 'text-zinc-400 hover:text-zinc-600'" class="p-1.5 rounded-lg transition-all" title="6 Columns">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path></svg>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Products Grid -->
                 <div class="flex-1 overflow-y-auto p-6 relative custom-scrollbar">
                     <!-- Global Loading Overlay for Search/Filter -->
-                    <div wire:loading.flex wire:target="search, selectedCategory, loadProducts" class="absolute inset-0 bg-white/80 backdrop-blur-sm z-20 items-center justify-center hidden">
+                    <div wire:loading.flex wire:target="search, selectedCategory, stockFilter, loadProducts" class="absolute inset-0 bg-white/80 backdrop-blur-sm z-20 items-center justify-center hidden">
                         <div class="flex flex-col items-center">
                             <svg class="animate-spin h-10 w-10 text-indigo-600 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -72,7 +104,13 @@
                             <span class="text-sm font-medium text-indigo-600">Loading products...</span>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-2 lg:grid-cols-3 gap-4"
+                        :class="{
+                            'xl:grid-cols-4': columnCount === 4,
+                            'xl:grid-cols-5': columnCount === 5,
+                            'xl:grid-cols-6': columnCount === 6
+                        }"
+                    >
                         @foreach($products as $product)
                             @php
                                 $stock = $product->stocks->first();
@@ -326,17 +364,21 @@
                     <div>
                         <label class="block text-sm font-medium text-zinc-700 mb-1">Cash Received</label>
                         <div class="relative" x-data="{ 
+                            inputValue: '',
                             format(value) {
                                 if (!value) return '';
                                 return value.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
                             }
-                        }">
+                        }"
+                        @transaction-completed.window="inputValue = ''"
+                        >
                             <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
                                 <span class="text-zinc-500 font-medium">Rp</span>
                             </div>
                             <input 
                                 type="text" 
-                                x-on:input="$el.value = format($el.value); $wire.set('cash', $el.value.replace(/\./g, ''))"
+                                x-model="inputValue"
+                                x-on:input="inputValue = format($el.value); $wire.set('cash', inputValue.replace(/\./g, ''))"
                                 class="w-full rounded-xl border-zinc-200 pl-12 py-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500/20 text-lg font-medium" 
                                 placeholder="0"
                             >

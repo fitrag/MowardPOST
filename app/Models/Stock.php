@@ -19,4 +19,15 @@ class Stock extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+    protected static function booted()
+    {
+        static::saved(function ($stock) {
+            \Illuminate\Support\Facades\Cache::put('products_last_updated', now()->timestamp);
+        });
+
+        static::deleted(function ($stock) {
+            \Illuminate\Support\Facades\Cache::put('products_last_updated', now()->timestamp);
+        });
+    }
 }
