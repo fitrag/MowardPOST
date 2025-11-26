@@ -34,6 +34,39 @@
                 @error('business_name') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
             </div>
 
+            <!-- Business Type -->
+            <div>
+                <label class="block text-sm font-medium text-zinc-700 mb-3">Business Type</label>
+                <div class="grid grid-cols-2 gap-4">
+                    <label class="relative flex cursor-pointer rounded-lg border bg-white p-4 shadow-sm focus:outline-none" :class="$wire.business_type === 'retail' ? 'border-indigo-600 ring-2 ring-indigo-600/20' : 'border-zinc-300'">
+                        <input type="radio" wire:model="business_type" value="retail" class="sr-only">
+                        <span class="flex flex-1">
+                            <span class="flex flex-col">
+                                <span class="block text-sm font-medium text-zinc-900">Retail Store</span>
+                                <span class="mt-1 flex items-center text-sm text-zinc-500">Standard POS for retail businesses.</span>
+                            </span>
+                        </span>
+                        <svg class="h-5 w-5 text-indigo-600" :class="$wire.business_type === 'retail' ? 'block' : 'hidden'" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                    </label>
+
+                    <label class="relative flex cursor-pointer rounded-lg border bg-white p-4 shadow-sm focus:outline-none" :class="$wire.business_type === 'restaurant' ? 'border-indigo-600 ring-2 ring-indigo-600/20' : 'border-zinc-300'">
+                        <input type="radio" wire:model="business_type" value="restaurant" class="sr-only">
+                        <span class="flex flex-1">
+                            <span class="flex flex-col">
+                                <span class="block text-sm font-medium text-zinc-900">Restaurant</span>
+                                <span class="mt-1 flex items-center text-sm text-zinc-500">Enables Kitchen Display System (KDS).</span>
+                            </span>
+                        </span>
+                        <svg class="h-5 w-5 text-indigo-600" :class="$wire.business_type === 'restaurant' ? 'block' : 'hidden'" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                    </label>
+                </div>
+                @error('business_type') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+            </div>
+
             <!-- Tax Rate -->
             <div>
                 <div class="relative">

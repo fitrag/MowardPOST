@@ -3,6 +3,7 @@
 use App\Livewire\Auth\Login;
 use App\Livewire\Dashboard;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\MemberCardController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -41,5 +42,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/settings', \App\Livewire\Admin\SettingManager::class)->name('settings')->middleware('menu.access:settings');
     
     // Member Card Export
-    Route::get('/customers/{customer}/card/download', [\App\Http\Controllers\MemberCardController::class, 'download'])->name('customers.card.download');
+    Route::get('/member-card/{id}/download', [MemberCardController::class, 'download'])->name('member-card.download');
+    Route::get('/kitchen', \App\Livewire\Kitchen\KitchenDisplay::class)->name('kitchen');
 });

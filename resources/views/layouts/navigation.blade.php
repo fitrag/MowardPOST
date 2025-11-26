@@ -28,11 +28,22 @@
             @endif
 
             @if(Auth::user()->hasMenuAccess('pos'))
-                <a href="{{ route('pos') }}" wire:navigate 
-                   class="flex items-center gap-3 py-3 text-sm font-medium rounded-xl transition-all duration-200 {{ request()->routeIs('pos') ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/50' : 'text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900' }}"
+                <a href="{{ route('pos') }}" wire:navigate title="Point of Sale" class="flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 group {{ request()->routeIs('pos') ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/50' : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900' }}"
                    :class="sidebarMinimized ? 'justify-center px-2' : 'px-4'">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                    <span x-show="!sidebarMinimized" x-transition.opacity.duration.200ms class="whitespace-nowrap">Point of Sale</span>
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors {{ request()->routeIs('pos') ? 'bg-white/20' : 'bg-zinc-100 group-hover:bg-white' }}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    </div>
+                    <span class="font-medium" x-show="!sidebarMinimized">Point of Sale</span>
+                </a>
+            @endif
+
+            @if(\App\Models\Setting::getValue('business_type') === 'restaurant')
+                <a href="{{ route('kitchen') }}" wire:navigate title="Kitchen Display" class="flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 group {{ request()->routeIs('kitchen') ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/50' : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900' }}"
+                   :class="sidebarMinimized ? 'justify-center px-2' : 'px-4'">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors {{ request()->routeIs('kitchen') ? 'bg-white/20' : 'bg-zinc-100 group-hover:bg-white' }}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    </div>
+                    <span class="font-medium" x-show="!sidebarMinimized">Kitchen Display</span>
                 </a>
             @endif
 

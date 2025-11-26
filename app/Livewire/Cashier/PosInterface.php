@@ -269,6 +269,10 @@ class PosInterface extends Component
         DB::beginTransaction();
         
         try {
+            // Determine kitchen status based on business type
+            $businessType = \App\Models\Setting::getValue('business_type', 'retail');
+            $kitchenStatus = $businessType === 'restaurant' ? 'pending' : null;
+
             // Create transaction
             $transaction = Transaction::create([
                 'branch_id' => Auth::user()->branch_id,
@@ -281,6 +285,7 @@ class PosInterface extends Component
                 'change' => $this->change,
                 'payment_method' => 'cash',
                 'status' => 'completed',
+                'kitchen_status' => $kitchenStatus,
             ]);
             
             // Create transaction items and update stock
